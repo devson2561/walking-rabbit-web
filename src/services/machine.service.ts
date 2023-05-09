@@ -7,6 +7,12 @@ const list = async (): Promise<Machine[]> => {
   return res.data;
 };
 
+const create = async (body: any): Promise<Machine[]> => {
+  const res = await axios.post(baseURL, body);
+  return res.data;
+};
+
 export default {
   list,
+  create
 };

@@ -1,8 +1,8 @@
 import "mapbox-gl/dist/mapbox-gl.css";
 
-import { Cancel, Plus } from "iconoir-react";
+import { Cancel } from "iconoir-react";
 import { useEffect, useState } from "react";
-import Map, { GeolocateControl, Marker, Popup } from "react-map-gl";
+import Map, { GeolocateControl, Marker } from "react-map-gl";
 import { Link } from "react-router-dom";
 
 import MachineCard from "../components/home/MachineCard";

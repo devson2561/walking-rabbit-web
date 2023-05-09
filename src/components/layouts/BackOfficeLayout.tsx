@@ -8,7 +8,7 @@ const menuItems = [
   },
   {
     title: "Categories",
-    path: "/admin/beverages",
+    path: "/admin/categories",
   },
   {
     title: "Machines",

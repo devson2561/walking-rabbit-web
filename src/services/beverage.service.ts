@@ -1,5 +1,6 @@
 import axios from "../config/axios.config";
 import { Beverage, CreateBeverage } from "../interfaces/beverage.interface";
+import { BeverageIngredient } from "../interfaces/beverage-ingredient.interface";
 
 const baseURL = "beverages";
 
@@ -28,10 +29,20 @@ const update = async (id: string, body: CreateBeverage): Promise<Beverage> => {
   return res.data;
 };
 
+const listIngredients = async (
+  beverage_ids: string[]
+): Promise<BeverageIngredient[]> => {
+  const res = await axios.get(`${baseURL}/ingredients`, {
+    params: { beverages: beverage_ids },
+  });
+  return res.data;
+};
+
 export default {
   list,
   get,
   create,
   remove,
   update,
+  listIngredients,
 };
