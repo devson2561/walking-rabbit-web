@@ -1,17 +1,17 @@
-import {
-  createBrowserRouter,
-  Navigate,
-  RouterProvider,
-} from "react-router-dom";
+import { createBrowserRouter, RouterProvider } from "react-router-dom";
 
 import BackOfficeLayout from "./components/layouts/BackOfficeLayout";
 import MachineLayout from "./components/layouts/MachineLayout";
 import BeveragesPage from "./pages/backoffice/beverage/BeveragesPage";
 import CreateBeveragePage from "./pages/backoffice/beverage/CreateBeveragePage";
-import HomePage from "./pages/HomePage";
-import MachineHomePage from "./pages/machine/MachineHomePage";
-import MachinesPage from "./pages/backoffice/machine/MachinesPage";
 import CreateMachinePage from "./pages/backoffice/machine/CreateMachinePage";
+import MachinesPage from "./pages/backoffice/machine/MachinesPage";
+import HomePage from "./pages/HomePage";
+import ConfigOrderPage from "./pages/machine/ConfigOrderPage";
+import MachineHomePage from "./pages/machine/MachineHomePage";
+import MachineProductsPage from "./pages/machine/MachineProductsPage";
+import MachineStocksPage from "./pages/machine/MachineStocksPage";
+import OrderProcessingPage from "./pages/machine/OrderProcessingPage";
 
 function App() {
   const router = createBrowserRouter([
@@ -24,8 +24,24 @@ function App() {
       element: <MachineLayout />,
       children: [
         {
-          path: ":id",
+          path: ":machineId",
           element: <MachineHomePage />,
+        },
+        {
+          path: ":machineId/stock",
+          element: <MachineStocksPage />,
+        },
+        {
+          path: ":machineId/products",
+          element: <MachineProductsPage />,
+        },
+        {
+          path: ":machineId/products/:productId",
+          element: <ConfigOrderPage />,
+        },
+        {
+          path: ":machineId/orders/:orderId/processing",
+          element: <OrderProcessingPage />,
         },
       ],
     },
@@ -35,19 +51,38 @@ function App() {
       children: [
         {
           path: "beverages",
-          element: <BeveragesPage />,
+          children: [
+            {
+              path: "",
+              element: <BeveragesPage />,
+            },
+            {
+              path: "create",
+              element: <CreateBeveragePage />,
+            },
+            {
+              path: ":id/edit",
+              element: <CreateBeveragePage />,
+            },
+          ],
         },
-        {
-          path: "beverages/create",
-          element: <CreateBeveragePage />,
-        },
+
         {
           path: "machines",
-          element: <MachinesPage />,
-        },
-        {
-          path: "machines/create",
-          element: <CreateMachinePage />,
+          children: [
+            {
+              path: "",
+              element: <MachinesPage />,
+            },
+            {
+              path: "create",
+              element: <CreateMachinePage />,
+            },
+            {
+              path: ":id/edit",
+              element: <CreateMachinePage />,
+            },
+          ],
         },
       ],
     },

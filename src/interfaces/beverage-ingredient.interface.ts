@@ -6,7 +6,7 @@ export interface BeverageIngredient {
   usage: number;
 
   ingredient_id: string;
-  beverage_id: string;
+  beverage_id?: string;
 
   ingredient?: Ingredient;
   beverage?: Beverage;

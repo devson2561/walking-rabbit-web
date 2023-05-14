@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 
 import { showErrorDialog } from "../../../helpers/showErrorDialog";
@@ -7,6 +7,8 @@ import { Beverage } from "../../../interfaces/beverage.interface";
 import beverageService from "../../../services/beverage.service";
 
 export default function BeveragesPage() {
+  const navigate = useNavigate();
+
   const [beverages, setBeverages] = useState<Beverage[]>([]);
 
   const onInit = async () => {
@@ -54,7 +56,12 @@ export default function BeveragesPage() {
               <td>{beverage.category?.title}</td>
               <td>
                 <div className="flex flex-row">
-                  <button className="btn btn-primary btn-sm rounded-md">
+                  <button
+                    className="btn btn-primary btn-sm rounded-md"
+                    onClick={() =>
+                      navigate(`/admin/beverages/${beverage.id}/edit`)
+                    }
+                  >
                     Edit
                   </button>
                 </div>

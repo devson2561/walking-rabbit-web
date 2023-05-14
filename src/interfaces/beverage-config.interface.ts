@@ -3,4 +3,6 @@ export interface BeverageConfig {
   key: string;
   value: string;
   additional_price: number;
+  is_multiple: boolean;
+  is_default: boolean;
 }

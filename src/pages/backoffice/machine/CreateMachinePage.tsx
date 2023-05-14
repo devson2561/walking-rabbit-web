@@ -1,28 +1,17 @@
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useEffect, useState } from "react";
-import { Controller, useFieldArray, useForm } from "react-hook-form";
-import Map, {
-  GeolocateControl,
-  Marker,
-  Popup,
-  ViewStateChangeEvent,
-} from "react-map-gl";
-import { useNavigate } from "react-router-dom";
+import { Controller, useForm } from "react-hook-form";
+import Map, { Marker, ViewStateChangeEvent } from "react-map-gl";
+import { useNavigate, useParams } from "react-router-dom";
 import Select from "react-select";
 import Swal from "sweetalert2";
 import * as Yup from "yup";
 
 import { showErrorDialog } from "../../../helpers/showErrorDialog";
-import {
-  Beverage,
-  CreateBeverage,
-} from "../../../interfaces/beverage.interface";
-import { BeverageConfig } from "../../../interfaces/beverage-config.interface";
+import { Beverage } from "../../../interfaces/beverage.interface";
 import { BeverageIngredient } from "../../../interfaces/beverage-ingredient.interface";
-import { Category } from "../../../interfaces/category.interface";
-import { Ingredient } from "../../../interfaces/ingredient.interface";
+import { Machine } from "../../../interfaces/macine.interface";
 import beverageService from "../../../services/beverage.service";
-import ingredientService from "../../../services/ingredient.service";
 import machineService from "../../../services/machine.service";
 
 const validationSchema = Yup.object().shape({
@@ -33,11 +22,10 @@ const validationSchema = Yup.object().shape({
 
 const MAPBOX_TOKEN =
   "pk.eyJ1IjoiZGV2c29uMjU2MSIsImEiOiJjbGhjOWtjdnMwdTVqM3JwY2U4aGp4ODh4In0.0SJusQqlWyCm7NLeeT6YxA";
-const imgUrl =
-  "https://positioningmag.com/wp-content/uploads/2021/12/TAO-BIN-01.jpg";
 
 export default function CreateMachinePage() {
   const navigate = useNavigate();
+  const { id } = useParams();
   const [viewport, setViewport] = useState({
     longitude: 100.523186,
     latitude: 13.736717,
@@ -52,6 +40,7 @@ export default function CreateMachinePage() {
   const [selectedBeverages, setSelectedBeverages] = useState<
     readonly Beverage[]
   >([]);
+  const [machine, setMachine] = useState<Machine | undefined>();
 
   const formOptions = { resolver: yupResolver(validationSchema) };
   const {
@@ -60,7 +49,6 @@ export default function CreateMachinePage() {
     formState: { errors },
     control,
     setValue,
-    getValues,
     watch,
   } = useForm(formOptions);
 
@@ -74,8 +62,34 @@ export default function CreateMachinePage() {
 
   const onInit = async () => {
     Swal.showLoading();
-    await Promise.all([fetchBeverages()]);
+    await Promise.all([fetchBeverages(), fetchMachine()]);
     Swal.close();
+  };
+
+  const fetchMachine = async () => {
+    if (!id) return;
+    const data = await machineService.get(id);
+    const stocks = await machineService.loadStocks(id);
+    setMachine(data);
+    setValue("title", data.title);
+    setValue("lat", data.location?.coordinates[0]);
+    setValue("lng", data.location?.coordinates[1]);
+    setViewport({
+      ...viewport,
+      latitude: data.location?.coordinates[0],
+      longitude: data.location?.coordinates[1],
+    });
+    setSelectedBeverages(data.beverages);
+
+    if (stocks) {
+      for (const b of stocks) {
+        setValue(
+          `stock.${b.ingredient_id}`,
+          Math.ceil((b.stock / b.capacity) * 100)
+        );
+        setValue(`capacity.${b.ingredient_id}`, b.capacity);
+      }
+    }
   };
 
   const fetchIngredients = async () => {
@@ -118,13 +132,18 @@ export default function CreateMachinePage() {
     const body = {
       title,
       location: [lat, lng],
-      stocks,
+      stocks: stocks.map((stock) => ({
+        ...stock,
+        stock: (stock.stock * stock.capacity) / 100,
+      })),
       beverages: selectedBeverages.map((b) => b.id),
     };
 
     Swal.showLoading();
     try {
-      await machineService.create(body);
+      id
+        ? await machineService.update(id, body)
+        : await machineService.create(body);
       Swal.close();
       Swal.fire("สำเร็จ", "เพิ่มสินค้าสำเร็จ", "success");
       navigate(-1);

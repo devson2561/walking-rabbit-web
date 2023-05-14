@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 
 import { showErrorDialog } from "../../../helpers/showErrorDialog";
@@ -7,6 +7,8 @@ import { Machine } from "../../../interfaces/macine.interface";
 import machineService from "../../../services/machine.service";
 
 export default function MachinesPage() {
+  const navigate = useNavigate();
+
   const [machines, setMachines] = useState<Machine[]>([]);
 
   const onInit = async () => {
@@ -52,7 +54,13 @@ export default function MachinesPage() {
               <td>{machine.title}</td>
               <td>
                 <div className="flex flex-row">
-                  <button className="btn btn-primary btn-sm rounded-md">
+                  <button
+                    className="btn btn-primary btn-sm rounded-md"
+                    type="button"
+                    onClick={() =>
+                      navigate(`/admin/machines/${machine.id}/edit`)
+                    }
+                  >
                     Edit
                   </button>
                 </div>
